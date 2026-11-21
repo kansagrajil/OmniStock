@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - OmniStock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .profile-pic-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(135deg, #00a76f 0%, #007867 100%);
+            box-shadow: 0 10px 20px rgba(0, 167, 111, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .profile-pic-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 167, 111, 0.3);
+        }
+
+        #currentProfilePic {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            background: white;
+        }
+
+        .upload-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            color: #00a76f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .upload-btn:hover {
+            background: #00a76f;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px !important;
+        }
+    </style>
+    <!-- Lenis for Smooth Scrolling -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar placeholder -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1">
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold m-0">My Profile</h2>
+                    <p class="text-muted m-0">Manage your account settings</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+
+                    <div id="userInfo" class="d-flex align-items-center gap-2">
+                        <img src="../assets/images/avatar.png" class="rounded-circle" width="40" height="40">
+                        <span class="fw-medium">User</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <form id="profileForm">
+                                <div class="text-center mb-5">
+                                    <div class="profile-pic-container">
+                                        <img id="currentProfilePic" src="../assets/images/avatar.png"
+                                            alt="Profile Picture">
+                                        <label for="profilePicture" class="upload-btn">
+                                            <i class="bi bi-camera-fill"></i>
+                                            <input type="file" id="profilePicture" class="d-none" accept="image/*">
+                                        </label>
+                                    </div>
+                                    <h4 class="mt-4 fw-bold mb-1" id="displayName">Loading...</h4>
+                                    <span class="badge rounded-pill bg-light text-success px-3 py-2 border"
+                                        id="displayRole">Staff</span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" id="name" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" id="email" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">New Password (optional)</label>
+                                    <div class="input-group">
+                                        <input type="password" id="password" class="form-control"
+                                            placeholder="Leave blank to keep current">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePassword()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Min 6 characters</small>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/api-v2.js"></script>
+    <script src="../assets/js/auth-v2.js"></script>
+    <script src="../assets/js/common.js"></script>
+    <script>
+        if (!checkAuth()) window.location.href = 'login.html';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderSidebar('sub-profile'); // Assuming sidebar logic handles active state
+            await loadProfile();
+        });
+
+        async function loadProfile() {
+            try {
+                Loader.show();
+                const user = await API.auth.getMe();
+
+                document.getElementById('name').value = user.name;
+                document.getElementById('email').value = user.email;
+                document.getElementById('displayName').textContent = user.name;
+                document.getElementById('displayRole').textContent = user.role.toUpperCase();
+
+                if (user.profilePicture && user.profilePicture !== 'default-profile.png') {
+                    const picUrl = '/uploads/' + user.profilePicture;
+                    document.getElementById('currentProfilePic').src = picUrl;
+
+                    // Also update header avatar if possible
+                    const headerAvatar = document.querySelector('#userInfo img');
+                    if (headerAvatar) headerAvatar.src = picUrl;
+                }
+            } catch (error) {
+                Toast.error('Failed to load profile');
+            } finally {
+                Loader.hide();
+            }
+        }
+
+        // Preview image on select
+        document.getElementById('profilePicture').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ex) {
+                    document.getElementById('currentProfilePic').src = ex.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('profileForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('email', document.getElementById('email').value);
+
+            const password = document.getElementById('password').value;
+            if (password) formData.append('password', password);
+
+            const file = document.getElementById('profilePicture').files[0];
+            if (file) formData.append('profilePicture', file);
+
+            try {
+                Loader.show();
+                const updatedUser = await API.auth.updateDetails(formData);
+                saveUser(updatedUser); // Update local storage
+                Toast.success('Profile updated successfully');
+                loadProfile(); // Reload to confirm changes
+            } catch (error) {
+                Toast.error(error.message || 'Update failed');
+            } finally {
+                Loader.hide();
+            }
+        };
+
+        function togglePassword() {
+            const input = document.getElementById('password');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+
+</html>

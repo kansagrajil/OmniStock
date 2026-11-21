@@ -1,0 +1,8 @@
+﻿Admin User | ID: 694cfd6e98d0324c894c2758 | Email: admin@stockomni.com
+Staff User | ID: 694cfd6e98d0324c894c275a | Email: staff@stockomni.com
+marsh | ID: 694cff6bb60492c1cac031d7 | Email: marsh@test.com
+kon | ID: 694e12ca5de5864d04512040 | Email: kon@gmail.com
+Mark | ID: 694e175f4c013a0add45e441 | Email: mark@gmail.com
+marsh | ID: 694e7dee27624691d7fcb539 | Email: marsh12@gmail.com
+marsh | ID: 694e7e7127624691d7fcb53d | Email: marsh07@gmail.com
+Test Agent | ID: 694ea0b7accdbee52a40e47e | Email: testagent@example.com

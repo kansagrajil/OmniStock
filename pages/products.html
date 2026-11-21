@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - OmniStock</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- Lenis for Smooth Scrolling -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="page-header animate__animated animate__fadeInDown">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item small"><a href="dashboard.html"
+                                class="text-muted text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item small active" aria-current="page">Products</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="mb-0 h3 fw-bold">Products</h2>
+                    <span class="badge bg-primary-light text-primary-dark rounded-pill px-3 py-2"
+                        id="totalProductsCount">0 Total</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-primary px-4 py-2" id="btnAddProduct">
+                    <i class="bi bi-plus-lg me-2"></i> Add Product
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters & Search -->
+        <div class="card mb-4 border-0 shadow-sm animate__animated animate__fadeInUp" style="border-radius: 16px;">
+            <div class="card-body p-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-5">
+                        <div class="search-input-wrapper">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" class="form-control ps-5 py-2 border-0 bg-light" id="searchInput"
+                                placeholder="Search by name or SKU..." style="border-radius: 10px;">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <select class="form-select border-0 bg-light py-2" id="categoryFilter"
+                            style="border-radius: 10px;">
+                            <option value="">Categories</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <select class="form-select border-0 bg-light py-2" id="stockFilter"
+                            style="border-radius: 10px;">
+                            <option value="">Stock Status</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3 d-flex gap-2">
+                        <button class="btn btn-light flex-grow-1 py-2" id="btnResetFilters"
+                            style="border-radius: 10px; color: var(--secondary);">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInUp"
+            style="border-radius: 16px; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 80px">Image</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Product Info</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Category</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Price (₹)</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Stock Level</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Status</th>
+                            <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productList" class="border-top-0">
+                        <tr>
+                            <td colspan="7" class="text-center p-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted">Fetching your products...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-4" id="pagination">
+            <div class="text-muted small" id="recordCount">Showing 0 of 0 products</div>
+            <div class="d-flex gap-sm" id="pageButtons"></div>
+        </div>
+    </main>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="productModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px;">
+                        <i class="bi bi-box-seam fs-4"></i>
+                    </div>
+                    <h5 id="modalTitle" class="fw-bold mb-0">Add New Product</h5>
+                </div>
+                <button class="modal-close" id="btnModalClose">&times;</button>
+            </div>
+            <form id="productForm">
+                <div class="modal-body">
+                    <input type="hidden" id="productId">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="name" class="form-label">Product Name *</label>
+                                <input type="text" id="name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="sku" class="form-label">SKU *</label>
+                                <input type="text" id="sku" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select id="category" class="form-select" required></select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="supplier" class="form-label">Supplier *</label>
+                                <select id="supplier" class="form-select" required></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="price" class="form-label">Selling Price (₹) *</label>
+                                <input type="number" id="price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="costPrice" class="form-label">Cost Price (₹) *</label>
+                                <input type="number" id="costPrice" class="form-control" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="unit" class="form-label">Unit (kg, g, pcs, etc.)</label>
+                                <input type="text" id="unit" class="form-control" placeholder="e.g. kg, pcs"
+                                    list="unitOptions">
+                                <datalist id="unitOptions">
+                                    <option value="kg">
+                                    <option value="g">
+                                    <option value="pcs">
+                                    <option value="box">
+                                    <option value="m">
+                                    <option value="km">
+                                    <option value="l">
+                                    <option value="ml">
+                                    <option value="units">
+                                </datalist>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="quantity" class="form-label">Initial Qty</label>
+                                <input type="number" id="quantity" class="form-control" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="lowStockThreshold" class="form-label">Alert Threshold</label>
+                                <input type="number" id="lowStockThreshold" class="form-control" min="0" value="5">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="productImage">Product Image</label>
+                        <input type="file" id="productImage" class="form-control" accept="image/*">
+                        <div id="imagePreview" class="mt-2 text-center hidden">
+                            <img src="" alt="Preview" style="max-height: 150px; border-radius: 8px;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-4" id="btnCancel"
+                        style="border-radius: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4" id="saveBtn" style="border-radius: 10px;">Save
+                        Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/api-v2.js"></script>
+    <script src="../assets/js/auth-v2.js"></script>
+    <script src="../assets/js/common.js"></script>
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let searchTimer;
+
+        if (!checkAuth()) window.location.href = 'login.html';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            renderSidebar('products');
+            setupEventListeners();
+            await loadFormData();
+            await loadProducts();
+        });
+
+        function setupEventListeners() {
+            // Add Product button
+            const btnAdd = document.getElementById('btnAddProduct');
+            if (btnAdd) btnAdd.addEventListener('click', openAddModal);
+
+            // Filters
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.addEventListener('input', handleSearch);
+
+            const catFilter = document.getElementById('categoryFilter');
+            if (catFilter) catFilter.addEventListener('change', loadProducts);
+
+            const supFilter = document.getElementById('supplierFilter');
+            if (supFilter) supFilter.addEventListener('change', loadProducts);
+
+            const stockFilter = document.getElementById('stockFilter');
+            if (stockFilter) stockFilter.addEventListener('change', loadProducts);
+
+            const btnReset = document.getElementById('btnResetFilters');
+            if (btnReset) btnReset.addEventListener('click', resetFilters);
+
+            // Modal Controls
+            function handleClose() {
+                closeModal();
+            }
+
+            const btnClose = document.getElementById('btnModalClose');
+            if (btnClose) {
+                btnClose.onclick = handleClose; // Use onclick to prevent duplicate listeners
+            }
+
+            const btnCancel = document.getElementById('btnCancel');
+            if (btnCancel) {
+                btnCancel.onclick = handleClose;
+            }
+
+            // Image preview
+            const imgInput = document.getElementById('productImage');
+            if (imgInput) imgInput.addEventListener('change', previewImage);
+
+            // Close modal on overlay click
+            const modal = document.getElementById('productModal');
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+        }
+
+        async function loadFormData() {
+            try {
+                const [categories, suppliers] = await Promise.all([
+                    API.categories.getAll(),
+                    API.suppliers.getAll()
+                ]);
+
+                // Fill filters and form selects
+                const catFilter = document.getElementById('categoryFilter');
+                const catSelect = document.getElementById('category');
+                const supSelect = document.getElementById('supplier');
+
+                const catOptions = categories.map(c => `<option value="${c._id}">${c.name}</option>`).join('');
+                catFilter.innerHTML += catOptions;
+                catSelect.innerHTML = '<option value="">Select Category</option>' + catOptions;
+
+                supSelect.innerHTML = '<option value="">Select Supplier</option>' +
+                    suppliers.map(s => `<option value="${s._id}">${s.name}</option>`).join('');
+
+            } catch (error) {
+                Toast.error('Failed to load filter data');
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                Loader.show();
+                const filters = {
+                    page: currentPage,
+                    limit: 10,
+                    search: document.getElementById('searchInput').value,
+                    category: document.getElementById('categoryFilter').value,
+                };
+
+                // Add stock filter if applied
+                const stockVal = document.getElementById('stockFilter').value;
+                if (stockVal === 'low-stock') filters.lowStock = true;
+
+                const response = await API.products.getAll(filters);
+                document.getElementById('totalProductsCount').textContent = `${response.total} Total`;
+                renderProducts(response.products);
+                renderPagination({
+                    page: response.page,
+                    pages: response.pages,
+                    total: response.total
+                });
+            } catch (error) {
+                Toast.error('Failed to load products');
+            } finally {
+                Loader.hide();
+            }
+        }
+
+        function renderProducts(products) {
+            const list = document.getElementById('productList');
+            if (!products.length) {
+                list.innerHTML = '<tr><td colspan="7" class="text-center p-4">No products found</td></tr>';
+                return;
+            }
+
+            list.innerHTML = products.map(p => {
+                const isLowStock = p.quantity <= p.lowStockThreshold && p.quantity > 0;
+                const isOutOfStock = p.quantity === 0;
+                let badgeClass = 'bg-success-light text-success';
+                let statusText = 'In Stock';
+
+                if (isOutOfStock) { badgeClass = 'bg-danger-light text-danger'; statusText = 'Out of Stock'; }
+                else if (isLowStock) { badgeClass = 'bg-warning-light text-warning'; statusText = 'Low Stock'; }
+
+                return `
+                    <tr>
+                        <td class="ps-4">
+                            <img src="${p.image ? '/uploads/' + p.image : '../assets/images/placeholder.png'}" 
+                                 class="rounded-3 shadow-sm border" style="width: 48px; height: 48px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">${p.name}</div>
+                            <div class="text-muted smaller">SKU: <span class="fw-medium">${p.sku}</span></div>
+                        </td>
+                        <td><span class="badge bg-primary-light text-primary rounded-pill px-3">${p.category?.name || 'Uncategorized'}</span></td>
+                        <td class="fw-bold text-dark">${formatCurrency(p.price)}</td>
+                        <td>
+                            <div class="fw-bold">${p.quantity} <span class="smaller text-muted fw-normal">${p.unit || 'Units'}</span></div>
+                        </td>
+                        <td><span class="badge ${badgeClass} rounded-pill px-3">${statusText}</span></td>
+                        <td class="pe-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-primary-light btn-sm rounded-3" data-action="edit" data-id="${p._id}" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm rounded-3 border-0" data-action="delete" data-id="${p._id}" data-name="${p.name}" title="Delete">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Attach event listeners to dynamically created buttons
+            document.querySelectorAll('[data-action="edit"]').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+            });
+            document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', () => handleDelete(btn.dataset.id, btn.dataset.name));
+            });
+        }
+
+        function renderPagination(pg) {
+            document.getElementById('recordCount').textContent = `Page ${pg.page} of ${pg.pages} (${pg.total} total products)`;
+
+            const pager = document.getElementById('pageButtons');
+            let buttons = '';
+
+            if (pg.page > 1) {
+                buttons += `<button class="btn btn-secondary btn-sm" data-page="${pg.page - 1}">Prev</button>`;
+            }
+
+            for (let i = 1; i <= pg.pages; i++) {
+                if (i === pg.page) {
+                    buttons += `<button class="btn btn-primary btn-sm">${i}</button>`;
+                } else if (i <= 3 || i >= pg.pages - 2 || (i >= pg.page - 1 && i <= pg.page + 1)) {
+                    buttons += `<button class="btn btn-secondary btn-sm" data-page="${i}">${i}</button>`;
+                } else if (i === 4 || i === pg.pages - 3) {
+                    buttons += `<span class="px-2">...</span>`;
+                }
+            }
+
+            if (pg.page < pg.pages) {
+                buttons += `<button class="btn btn-secondary btn-sm" data-page="${pg.page + 1}">Next</button>`;
+            }
+
+            pager.innerHTML = buttons;
+
+            // Attach event listeners to pagination buttons
+            pager.querySelectorAll('[data-page]').forEach(btn => {
+                btn.addEventListener('click', () => changePage(parseInt(btn.dataset.page)));
+            });
+        }
+
+        function changePage(p) {
+            currentPage = p;
+            loadProducts();
+        }
+
+        function handleSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentPage = 1;
+                loadProducts();
+            }, 500);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('stockFilter').value = '';
+            currentPage = 1;
+            loadProducts();
+        }
+
+        // Modal Logic
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Product';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('quantity').disabled = false;
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        async function openEditModal(id) {
+            try {
+                Loader.show();
+                const p = await API.products.getById(id);
+                document.getElementById('modalTitle').textContent = 'Edit Product';
+                document.getElementById('productId').value = p._id;
+                document.getElementById('name').value = p.name;
+                document.getElementById('sku').value = p.sku;
+                document.getElementById('category').value = p.category?._id || '';
+                document.getElementById('supplier').value = p.supplier?._id || '';
+                document.getElementById('price').value = p.price;
+                document.getElementById('costPrice').value = p.costPrice || 0;
+                document.getElementById('unit').value = p.unit || 'Units';
+                document.getElementById('quantity').value = p.quantity;
+                document.getElementById('quantity').disabled = true; // Use Stock Ops to change qty
+                document.getElementById('lowStockThreshold').value = p.lowStockThreshold;
+                document.getElementById('description').value = p.description || '';
+
+                if (p.image) {
+                    const preview = document.querySelector('#imagePreview img');
+                    preview.src = '/uploads/' + p.image;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                } else {
+                    document.getElementById('imagePreview').classList.add('hidden');
+                }
+
+                document.getElementById('productModal').classList.remove('hidden');
+            } catch (error) {
+                Toast.error('Failed to load product details');
+            } finally {
+                Loader.hide();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        function previewImage(e) {
+            const file = e?.target?.files?.[0] || e.files?.[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ex) {
+                    const preview = document.querySelector('#imagePreview img');
+                    preview.src = ex.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('productForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            const formData = new FormData();
+
+            formData.append('name', document.getElementById('name').value);
+            formData.append('sku', document.getElementById('sku').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('supplier', document.getElementById('supplier').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('costPrice', document.getElementById('costPrice').value);
+            formData.append('unit', document.getElementById('unit').value);
+            formData.append('lowStockThreshold', document.getElementById('lowStockThreshold').value);
+            formData.append('description', document.getElementById('description').value);
+
+            if (!id) formData.append('quantity', document.getElementById('quantity').value);
+
+            const imgFile = document.getElementById('productImage').files[0];
+            if (imgFile) formData.append('image', imgFile);
+
+            try {
+                Loader.show();
+                if (id) {
+                    await API.products.update(id, formData);
+                    Toast.success('Product updated successfully');
+                } else {
+                    await API.products.create(formData);
+                    Toast.success('Product created successfully');
+                    currentPage = 1; // Reset to first page to show new product
+                }
+                closeModal();
+                loadProducts();
+            } catch (error) {
+                Toast.error(error.message || 'Failed to save product');
+            } finally {
+                Loader.hide();
+            }
+        };
+
+        function handleDelete(id, name) {
+            Confirm.show('Delete Product', `Are you sure you want to delete "${name}"?`, async () => {
+                try {
+                    Loader.show();
+                    await API.products.delete(id);
+                    Toast.success('Product deleted');
+                    loadProducts();
+                } catch (error) {
+                    Toast.error('Failed to delete product');
+                } finally {
+                    Loader.hide();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

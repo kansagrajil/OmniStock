@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Operations - OmniStock</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .type-badge {
+            width: 100px;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .transaction-card {
+            border-left: 4px solid var(--gray-300);
+        }
+
+        .transaction-card.IN {
+            border-left-color: var(--success);
+        }
+
+        .transaction-card.OUT {
+            border-left-color: var(--danger);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="sidebar"></nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+        <header class="page-header animate__animated animate__fadeInDown">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item small"><a href="dashboard.html"
+                                class="text-muted text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item small active" aria-current="page">Stock Operations</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="mb-0 h3 fw-bold">Stock Operations</h2>
+                    <span class="badge bg-primary-light text-primary-dark rounded-pill px-3 py-2"
+                        id="lastOpBadge">Ready</span>
+                </div>
+            </div>
+            <div class="header-actions d-flex gap-2">
+
+                <button class="btn btn-primary px-4 py-2" id="btnStockIn">
+                    <i class="bi bi-plus-lg me-2"></i> Stock IN
+                </button>
+                <button class="btn btn-danger px-4 py-2" id="btnStockOut">
+                    <i class="bi bi-dash-lg me-2"></i> Stock OUT
+                </button>
+            </div>
+        </header>
+
+        <!-- Quick Stats / Actions -->
+        <div class="row g-4 mb-4 animate__animated animate__fadeInUp">
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm transition-hover" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="bg-success-light text-success rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-box-arrow-in-down fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted fw-bold mb-0">Stock IN</h6>
+                                <div class="h5 fw-bold mb-0">Arrivals</div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-0 font-italic">Record new inventory shipments.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm transition-hover" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="bg-danger-light text-danger rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-box-arrow-up-right fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted fw-bold mb-0">Stock OUT</h6>
+                                <div class="h5 fw-bold mb-0">Dispatches</div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-0 font-italic">Record sales or damaged returns.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Transaction History Table -->
+        <div class="card border-0 shadow-sm overflow-hidden animate__animated animate__fadeInUp"
+            style="border-radius: 16px;">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-clock-history text-primary me-2"></i> Transaction History
+                </h5>
+                <div class="d-flex gap-2">
+                    <select id="typeFilter" class="form-select border-0 bg-light py-2"
+                        style="width: 150px; border-radius: 8px;">
+                        <option value="">All Types</option>
+                        <option value="IN">Stock IN</option>
+                        <option value="OUT">Stock OUT</option>
+                    </select>
+                    <button class="btn btn-light btn-sm rounded-3 px-3 py-2" id="btnRefresh">
+                        <i class="bi bi-arrow-clockwise text-primary"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Date & Time</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Product Name</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted text-center">Type</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted text-center">Quantity</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Reason / Note</th>
+                            <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-end">Performed By</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionList" class="border-top-0">
+                        <tr>
+                            <td colspan="6" class="text-center p-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted">Fetching transaction history...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <!-- Modal for Stock Operation -->
+    <div id="stockModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div id="modalIcon"
+                        class="bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px;">
+                        <i class="bi bi-arrow-down-up fs-4"></i>
+                    </div>
+                    <h5 id="modalTitle" class="fw-bold mb-0">Stock Operation</h5>
+                </div>
+                <button class="modal-close" id="btnModalClose">&times;</button>
+            </div>
+            <form id="stockForm">
+                <div class="modal-body">
+                    <input type="hidden" id="opType">
+                    <div class="form-group">
+                        <label for="product">Select Product *</label>
+                        <select id="product" class="form-control" required>
+                            <option value="">Choose a product...</option>
+                        </select>
+                        <div id="currentQty" class="mt-1 small text-muted"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity *</label>
+                        <input type="number" id="quantity" class="form-control" required min="1"
+                            placeholder="Enter amount">
+                    </div>
+                    <div class="form-group mt-3" id="costField">
+                        <label for="unitCost">Unit Cost (₹) <small class="text-muted">(Optional, updates product
+                                cost)</small></label>
+                        <input type="number" id="unitCost" class="form-control" min="0" step="0.01"
+                            placeholder="Enter buying price per unit">
+                    </div>
+                    <div class="form-group mt-3" id="salesField">
+                        <label for="sellingPrice">Sales Price (₹) <small class="text-muted">(Optional, defaults to
+                                product price)</small></label>
+                        <input type="number" id="sellingPrice" class="form-control" min="0" step="0.01"
+                            placeholder="Enter selling price for this transaction">
+                    </div>
+                    <div class="form-group">
+                        <label for="reason">Reason / Note</label>
+                        <textarea id="reason" class="form-control"
+                            placeholder="e.g. New stock arrival, Sales, Damage return..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-4" id="btnCancel"
+                        style="border-radius: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4" id="saveBtn" style="border-radius: 10px;">Confirm
+                        Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/api-v2.js"></script>
+    <script src="../assets/js/auth-v2.js"></script>
+    <script src="../assets/js/common.js"></script>
+    <script>
+        let products = [];
+
+        if (!checkAuth()) window.location.href = 'login.html';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar('stock');
+            loadInitialData();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Stock IN/OUT buttons
+            const btnIn = document.getElementById('btnStockIn');
+            if (btnIn) btnIn.addEventListener('click', openStockIn);
+
+            const btnOut = document.getElementById('btnStockOut');
+            if (btnOut) btnOut.addEventListener('click', openStockOut);
+
+            // Modal Controls
+            function handleClose() {
+                closeModal();
+            }
+
+            const btnClose = document.getElementById('btnModalClose');
+            if (btnClose) btnClose.onclick = handleClose;
+
+            const btnCancel = document.getElementById('btnCancel');
+            if (btnCancel) btnCancel.onclick = handleClose;
+
+            // Filter and refresh
+            const typeFilter = document.getElementById('typeFilter');
+            if (typeFilter) typeFilter.addEventListener('change', loadTransactions);
+
+            const btnRefresh = document.getElementById('btnRefresh');
+            if (btnRefresh) btnRefresh.addEventListener('click', loadTransactions);
+
+            // Product selection
+            const productSelect = document.getElementById('product');
+            if (productSelect) productSelect.addEventListener('change', showCurrentQty);
+
+            // Close modal on overlay click
+            const modal = document.getElementById('stockModal');
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+        }
+
+        async function loadInitialData() {
+            try {
+                Loader.show();
+                products = await API.products.getAll({ limit: 1000 }).then(res => res.products);
+
+                const select = document.getElementById('product');
+                select.innerHTML += products.map(p => `<option value="${p._id}">${p.name} (${p.sku})</option>`).join('');
+
+                loadTransactions();
+            } catch (error) {
+                Toast.error('Failed to load products');
+            } finally {
+                Loader.hide();
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                Loader.show();
+                const type = document.getElementById('typeFilter').value;
+                const response = await API.stock.getTransactions();
+                let transactions = response.transactions || [];
+
+                let filtered = transactions;
+                if (type) {
+                    filtered = transactions.filter(t => t.type === type);
+                }
+
+                renderTransactions(filtered);
+            } catch (error) {
+                Toast.error('Failed to load transaction history');
+            } finally {
+                Loader.hide();
+            }
+        }
+
+        function renderTransactions(data) {
+            const list = document.getElementById('transactionList');
+            if (!data.length) {
+                list.innerHTML = '<tr><td colspan="6" class="text-center p-4">No transactions found</td></tr>';
+                return;
+            }
+
+            list.innerHTML = data.map(t => {
+                const badgeClass = t.type === 'IN' ? 'bg-success-light text-success' : 'bg-danger-light text-danger';
+                const typeIcon = t.type === 'IN' ? 'bi-arrow-down-left' : 'bi-arrow-up-right';
+                const qtyPrefix = t.type === 'IN' ? '+' : '-';
+                const qtyClass = t.type === 'IN' ? 'text-success' : 'text-danger';
+
+                return `
+                    <tr class="transaction-row animate__animated animate__fadeIn" style="border-left: 4px solid ${t.type === 'IN' ? 'var(--success)' : 'var(--danger)'}">
+                        <td class="ps-4">
+                            <div class="text-dark fw-medium small">${formatDate(t.createdAt).split(',')[0]}</div>
+                            <div class="text-muted smaller">${formatDate(t.createdAt).split(',')[1] || ''}</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">${t.product?.name || 'Deleted Product'}</div>
+                            <div class="text-muted smaller">ID: ${t.product?._id?.substring(0, 8) || 'N/A'}...</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge ${badgeClass} rounded-pill px-3 py-2" style="min-width: 80px;">
+                                <i class="bi ${typeIcon} me-1"></i> ${t.type}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="fw-bold h6 ${qtyClass}">${qtyPrefix}${t.quantity} <small class="text-muted fw-normal">${t.product?.unit || 'Units'}</small></span>
+                        </td>
+                        <td>
+                            <span class="text-muted small">${t.notes || '<span class="fst-italic opacity-50">No note provided</span>'}</span>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-medium">
+                                <i class="bi bi-person-circle me-1 opacity-50"></i> ${t.performedBy?.name || 'System'}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openStockIn() {
+            document.getElementById('modalTitle').textContent = 'Stock IN (Add Quantity)';
+            document.getElementById('opType').value = 'IN';
+            document.getElementById('saveBtn').className = 'btn btn-success';
+            document.getElementById('saveBtn').textContent = 'Confirm Stock IN';
+            document.getElementById('stockForm').reset();
+            document.getElementById('currentQty').textContent = '';
+            document.getElementById('costField').classList.remove('hidden'); // Show cost field
+            document.getElementById('salesField').classList.add('hidden'); // Hide sales field
+            document.getElementById('stockModal').classList.remove('hidden');
+        }
+
+        function openStockOut() {
+            document.getElementById('modalTitle').textContent = 'Stock OUT (Remove Quantity)';
+            document.getElementById('opType').value = 'OUT';
+            document.getElementById('saveBtn').className = 'btn btn-danger';
+            document.getElementById('saveBtn').textContent = 'Confirm Stock OUT';
+            document.getElementById('stockForm').reset();
+            document.getElementById('currentQty').textContent = '';
+            document.getElementById('costField').classList.add('hidden'); // Hide cost field
+            document.getElementById('salesField').classList.remove('hidden'); // Show sales field
+            document.getElementById('stockModal').classList.remove('hidden');
+        }
+
+        function showCurrentQty() {
+            const pid = document.getElementById('product').value;
+            const p = products.find(x => x._id === pid);
+            if (p) {
+                document.getElementById('currentQty').textContent = `Current Stock: ${p.quantity} ${p.unit || 'units'}`;
+                // Pre-fill selling price if it's a Stock OUT
+                if (document.getElementById('opType').value === 'OUT') {
+                    document.getElementById('sellingPrice').value = p.price || 0;
+                }
+            } else {
+                document.getElementById('currentQty').textContent = '';
+                document.getElementById('sellingPrice').value = '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('stockModal').classList.add('hidden');
+        }
+
+        document.getElementById('stockForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const type = document.getElementById('opType').value;
+            const pid = document.getElementById('product').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            const reason = document.getElementById('reason').value;
+
+            if (!pid || !qty || qty <= 0) {
+                Toast.error('Please enter a valid quantity');
+                return;
+            }
+
+            try {
+                Loader.show();
+                if (type === 'IN') {
+                    const unitCost = document.getElementById('unitCost').value;
+                    await API.stock.stockIn({ productId: pid, quantity: qty, notes: reason, unitCost: unitCost });
+                    Toast.success('Stock added successfully');
+                } else {
+                    const sellingPrice = document.getElementById('sellingPrice').value;
+                    await API.stock.stockOut({ productId: pid, quantity: qty, notes: reason, sellingPrice: sellingPrice });
+                    Toast.success('Stock removed successfully');
+                }
+                closeModal();
+                loadTransactions();
+                // Refresh products list for current qty updates
+                products = await API.products.getAll({ limit: 1000 }).then(res => res.products);
+            } catch (error) {
+                Toast.error(error.message || 'Operation failed');
+            } finally {
+                Loader.hide();
+            }
+        };
+    </script>
+</body>
+
+</html>

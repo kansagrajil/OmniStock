@@ -1,0 +1,5 @@
+﻿Marsh has 4 products.
+tomato | Qty: 48 | Cost: 0 | Price: 150 | Created: Fri Dec 26 2025 09:44:48 GMT+0530 (India Standard Time)
+potato | Qty: 85 | Cost: 0 | Price: 150 | Created: Fri Dec 26 2025 09:45:15 GMT+0530 (India Standard Time)
+onion | Qty: 500 | Cost: 0 | Price: 120 | Created: Fri Dec 26 2025 09:46:00 GMT+0530 (India Standard Time)
+bringel | Qty: 410 | Cost: 0 | Price: 200 | Created: Fri Dec 26 2025 09:46:36 GMT+0530 (India Standard Time)

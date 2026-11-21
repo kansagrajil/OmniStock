@@ -1,0 +1,48 @@
+﻿Connected to DB
+Found 6 products total.
+
+Product: tomato
+Created By: marsh (marsh@test.com)
+Quantity: 48
+Price: 150
+Cost Price: 0
+
+Product: potato
+Created By: marsh (marsh@test.com)
+Quantity: 85
+Price: 150
+Cost Price: 0
+
+Product: onion
+Created By: marsh (marsh@test.com)
+Quantity: 500
+Price: 120
+Cost Price: 0
+
+Product: bringel
+Created By: marsh (marsh@test.com)
+Quantity: 410
+Price: 200
+Cost Price: 0
+
+Product: tomato
+Created By: marsh (marsh07@gmail.com)
+Quantity: 751
+Price: 60
+Cost Price: 0
+
+Product: Agent Chip
+Created By: Test Agent (testagent@example.com)
+Quantity: 60
+Price: 100
+Cost Price: 10
+
+Users in DB:
+- Admin User (ID: 694cfd6e98d0324c894c2758)
+- Staff User (ID: 694cfd6e98d0324c894c275a)
+- marsh (ID: 694cff6bb60492c1cac031d7)
+- kon (ID: 694e12ca5de5864d04512040)
+- Mark (ID: 694e175f4c013a0add45e441)
+- marsh (ID: 694e7dee27624691d7fcb539)
+- marsh (ID: 694e7e7127624691d7fcb53d)
+- Test Agent (ID: 694ea0b7accdbee52a40e47e)

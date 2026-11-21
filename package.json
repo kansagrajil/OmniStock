@@ -1,0 +1,13 @@
+{
+  "name": "omnistock",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start-all": "echo Please run 'run_system.bat' file to start both servers easily.",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

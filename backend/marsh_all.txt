@@ -1,0 +1,15 @@
+﻿Found 3 users named marsh.
+
+User: marsh (ID: 694cff6bb60492c1cac031d7)
+- Product Count: 4
+  - tomato | Qty: 48 | Val: 7200
+  - potato | Qty: 85 | Val: 12750
+  - onion | Qty: 500 | Val: 60000
+  - bringel | Qty: 410 | Val: 82000
+
+User: marsh (ID: 694e7dee27624691d7fcb539)
+- Product Count: 0
+
+User: marsh (ID: 694e7e7127624691d7fcb53d)
+- Product Count: 1
+  - tomato | Qty: 751 | Val: 45060

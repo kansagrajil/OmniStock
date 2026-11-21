@@ -1,0 +1,24 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00a76f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#007867;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Transparent Background: No Rect element here -->
+
+  <!-- Abstract Inventory Hexagon/Cube -->
+  <!-- Left Face -->
+  <path d="M100 180 L30 140 L30 60 L100 100 Z" fill="#007867"/>
+  
+  <!-- Right Face -->
+  <path d="M100 180 L170 140 L170 60 L100 100 Z" fill="#00a76f"/>
+  
+  <!-- Top Face (Open Box Look) -->
+  <path d="M100 20 L30 60 L100 100 L170 60 Z" fill="#22c55e"/>
+  
+  <!-- Inner floating item (Suggestion of stock) -->
+  <rect x="85" y="45" width="30" height="30" transform="rotate(45 100 60)" fill="#ffffff" fill-opacity="0.9"/>
+
+</svg>

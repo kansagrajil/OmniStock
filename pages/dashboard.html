@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - OmniStock</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Dashboard-specific enhancements */
+        .welcome-banner {
+            background: linear-gradient(135deg, #007867 0%, #00a76f 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 500px;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 500px;
+        }
+    </style>
+    </style>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lenis for Smooth Scrolling -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <!-- Sidebar content will be loaded by common.js -->
+    </nav>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid-custom">
+            <header class="page-header animate__animated animate__fadeInDown">
+                <div class="page-title">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-speedometer2 text-primary"></i>
+                        <h2 class="mb-0 h4">Dashboard</h2>
+                    </div>
+                </div>
+                <div class="header-actions d-flex align-items-center gap-3">
+                    <span id="currentDate" class="text-muted small d-none d-md-inline fw-medium"></span>
+
+
+
+                    <div class="profile-menu ms-2">
+                        <img id="headerProfilePic" src="../assets/images/placeholder.png"
+                            class="rounded-circle shadow-sm border border-2 border-white object-fit-cover cursor-pointer hover-scale"
+                            width="48" height="48" onclick="window.location.href='profile.html'"
+                            title="Go to My Profile">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner animate__animated animate__fadeInUp">
+                <div class="welcome-content">
+                    <div class="welcome-title" id="welcomeMessage">Welcome Back!</div>
+                    <div class="welcome-subtitle">Here's what's happening with your inventory today</div>
+                    <div class="stat-badge mt-3">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDateTime"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-12 col-sm-6 col-xl-3 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+                    <div class="stats-card bg-gradient-info">
+                        <div class="stats-card-label">Total Products</div>
+                        <div class="stats-card-value counter-animation" id="totalProducts">0</div>
+                        <i class="bi bi-box stats-icon"></i>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+                    <div class="stats-card bg-gradient-success">
+                        <div class="stats-card-label">Total Stock Value</div>
+                        <div class="stats-card-value counter-animation" id="stockValue">₹0</div>
+                        <i class="bi bi-currency-rupee stats-icon"></i>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
+                    <div class="stats-card bg-gradient-warning">
+                        <div class="stats-card-label">Low Stock Items</div>
+                        <div class="stats-card-value counter-animation" id="lowStock">0</div>
+                        <i class="bi bi-exclamation-triangle stats-icon"></i>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
+                    <div class="stats-card bg-gradient-danger">
+                        <div class="stats-card-label">Total Suppliers</div>
+                        <div class="stats-card-value counter-animation" id="totalSuppliers">0</div>
+                        <i class="bi bi-people stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Daily Overview -->
+        <div class="row g-4 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.42s">
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="text-uppercase fw-bold text-muted small mb-1">Today's Purchases</h6>
+                                <h3 class="fw-bold mb-0 text-primary" id="todayPurchases">₹0</h3>
+                            </div>
+                            <div class="bg-primary-light text-primary rounded-circle p-3">
+                                <i class="bi bi-cart-plus fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="small text-muted">Total value of stock added today</div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="text-uppercase fw-bold text-muted small mb-1">Today's Sales</h6>
+                                <h3 class="fw-bold mb-0 text-success" id="todaySales">₹0</h3>
+                            </div>
+                            <div class="bg-success-light text-success rounded-circle p-3">
+                                <i class="bi bi-currency-rupee fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="small text-muted">Total value of stock sold today</div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="text-uppercase fw-bold text-muted small mb-1">Today's Net Profit</h6>
+                                <h3 class="fw-bold mb-0" id="todayProfit">₹0</h3>
+                            </div>
+                            <div class="bg-info-light text-info rounded-circle p-3">
+                                <i class="bi bi-graph-up-arrow fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="small text-muted">Net profit from today's sales (Sales - Purchase Cost)</div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row g-4 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.45s">
+            <div class="col-12 col-lg-8">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 16px;">
+                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Sales vs
+                            Purchases
+                        </h5>
+                        <select class="form-select form-select-sm" style="width: auto;" id="pnlTimeframe"
+                            onchange="loadCharts()">
+                            <option value="weekly" selected>Last 7 Days</option>
+                            <option value="monthly">This Month</option>
+                            <option value="yearly">This Year</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pnlChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 16px;">
+                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-trophy text-warning me-2"></i>Top Products</h5>
+                        <select class="form-select form-select-sm" style="width: auto;" id="productMetric"
+                            onchange="renderCharts(window.currentAnalyticsData)">
+                            <option value="sales">By Sales</option>
+                            <option value="stock">By Stock</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="productsChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.5s">
+            <!-- ... existing quick actions unchanged ... -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-lightning-charge text-warning me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <a href="products.html" class="quick-action">
+                                    <div class="quick-action-icon qa-primary">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </div>
+                                    <div class="quick-action-label">Add Product</div>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="stock.html" class="quick-action">
+                                    <div class="quick-action-icon qa-success">
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </div>
+                                    <div class="quick-action-label">Manage Stock</div>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="suppliers.html" class="quick-action">
+                                    <div class="quick-action-icon qa-warning">
+                                        <i class="bi bi-truck"></i>
+                                    </div>
+                                    <div class="quick-action-label">Suppliers</div>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="reports.html" class="quick-action">
+                                    <div class="quick-action-icon qa-danger">
+                                        <i class="bi bi-file-earmark-bar-graph"></i>
+                                    </div>
+                                    <div class="quick-action-label">View Reports</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Alerts -->
+        <div class="row g-4 animate__animated animate__fadeInUp" style="animation-delay: 0.6s">
+            <div class="col-12 col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Recent Activity</h5>
+                        <span class="badge bg-primary" id="activityCount">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentActivity">
+                            <div class="text-center text-muted py-5">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div>Loading recent activity...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-bell text-warning me-2"></i>Low Stock Alerts</h5>
+                        <span class="badge bg-warning text-dark" id="alertCount">0</span>
+                    </div>
+                    <div class="card-body" id="lowStockList" style="max-height: 500px; overflow-y: auto;">
+                        <div class="text-center text-muted py-5">
+                            <div class="spinner-border text-warning mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>Loading alerts...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/api-v2.js"></script>
+    <script src="../assets/js/auth-v2.js"></script>
+    <script src="../assets/js/common.js"></script>
+    <script>
+        // Check Authentication
+        if (!checkAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar('dashboard');
+            updateDateTime();
+
+            // Theme Logic handled by common.js
+            // Listen for theme changes to update charts
+            window.addEventListener('themeChanged', () => {
+                if (window.currentAnalyticsData) {
+                    renderCharts(window.currentAnalyticsData);
+                }
+            });
+
+            loadDashboard();
+
+            // Update time every minute
+            setInterval(updateDateTime, 60000);
+
+            // Display welcome message with user name
+            // Display welcome message with user name and image
+            // Display welcome message with user name and image
+            // Display welcome message with user name and image
+            const user = getCurrentUser(); // Changed from getUser() to match auth-v2.js
+            if (user) {
+                if (user.name) document.getElementById('welcomeMessage').textContent = `Welcome Back, ${user.name}!`;
+
+                // Update header profile pic
+                const headerPic = document.getElementById('headerProfilePic');
+                if (headerPic) {
+                    if (user.profilePicture && user.profilePicture !== 'default-profile.png') {
+                        // Check if it's already a full URL or needs the base URL
+                        if (user.profilePicture.startsWith('http')) {
+                            headerPic.src = user.profilePicture;
+                        } else {
+                            // Use API_BASE_URL if defined, otherwise assume relative to root
+                            const baseUrl = (typeof API_BASE_URL !== 'undefined') ? API_BASE_URL.replace('/api', '') : '';
+                            headerPic.src = `${baseUrl}/uploads/${user.profilePicture}`;
+                        }
+                    }
+
+                    // Fallback on error
+                    headerPic.onerror = function () {
+                        this.src = '../assets/images/placeholder.png';
+                    };
+                }
+            }
+        });
+
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-US', options);
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            document.getElementById('currentDate').textContent = dateStr;
+            document.getElementById('currentDateTime').textContent = `${dateStr} • ${timeStr}`;
+        }
+
+        function animateCounter(element, target, duration = 1000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = Math.round(target);
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.round(current);
+                }
+            }, 16);
+        }
+
+        async function loadDashboard() {
+            try {
+                Loader.show();
+
+                // Use allSettled to allow partial loading if one API fails
+                const [statsResult, analyticsResult] = await Promise.allSettled([
+                    API.reports.getDashboard(),
+                    API.analytics.getDashboard(document.getElementById('pnlTimeframe').value)
+                ]);
+
+                // Handle Stats Data
+                if (statsResult.status === 'fulfilled') {
+                    const data = statsResult.value;
+
+                    animateCounter(document.getElementById('totalProducts'), data.totalProducts || 0);
+                    animateCounter(document.getElementById('lowStock'), data.lowStockCount || 0);
+                    document.getElementById('stockValue').textContent = formatCurrency(data.totalStockValue);
+
+                    // Update Recent Activity
+                    const activityContainer = document.getElementById('recentActivity');
+                    const activityCount = document.getElementById('activityCount');
+
+                    if (data.recentTransactions && data.recentTransactions.length > 0) {
+                        activityCount.textContent = data.recentTransactions.length;
+                        activityContainer.innerHTML = data.recentTransactions.slice(0, 10).map(t => `
+                            <div class="activity-item type-${t.type.toLowerCase()}">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <div class="fw-bold" style="color: var(--text-primary)">${t.product?.name || 'Deleted Product'}</div>
+                                    <span class="badge badge-${t.type === 'IN' ? 'success' : 'danger'}">
+                                        ${t.type === 'IN' ? 'STOCK IN' : 'STOCK OUT'}
+                                    </span>
+                                </div>
+                                <div class="small" style="color: var(--text-secondary)">
+                                    <i class="bi bi-box"></i> Qty: <strong>${t.quantity}</strong> | 
+                                    <i class="bi bi-person"></i> ${t.performedBy?.name || 'System'} | 
+                                    <i class="bi bi-clock"></i> ${formatDate(t.createdAt)}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        activityCount.textContent = '0';
+                        activityContainer.innerHTML = '<div class="text-center text-muted py-5"><i class="bi bi-inbox fs-1 opacity-25"></i><div class="mt-2">No recent activity</div></div>';
+                    }
+
+                    // Update Low Stock Items
+                    const lowStockList = document.getElementById('lowStockList');
+                    const alertCount = document.getElementById('alertCount');
+
+                    if (data.lowStockProducts && data.lowStockProducts.length > 0) {
+                        alertCount.textContent = data.lowStockProducts.length;
+                        lowStockList.innerHTML = data.lowStockProducts.map(p => `
+                             <div class="alert-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold mb-1" style="color: var(--text-primary)">${p.name}</div>
+                                        <div class="small" style="color: var(--text-secondary)">Current: <strong class="text-danger">${p.quantity}</strong> | Min: <strong>${p.lowStockThreshold}</strong></div>
+                                    </div>
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle"></i></span>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        alertCount.textContent = '0';
+                        lowStockList.innerHTML = '<div class="text-center text-muted py-5"><i class="bi bi-check-circle fs-1 opacity-25"></i><div class="mt-2">All stock levels healthy!</div></div>';
+                    }
+
+                } else {
+                    console.error("Dashboard Stats Failed:", statsResult.reason);
+                    Toast.error("Failed to load dashboard stats.");
+                }
+
+                // Handle Analytics Data
+                if (analyticsResult.status === 'fulfilled') {
+                    const analyticsData = analyticsResult.value;
+                    renderCharts(analyticsData);
+
+                    // Update Daily Overview
+                    if (analyticsData.today) {
+                        document.getElementById('todayPurchases').textContent = formatCurrency(analyticsData.today.purchases);
+                        document.getElementById('todaySales').textContent = formatCurrency(analyticsData.today.sales);
+
+                        const profit = analyticsData.today.profit || 0;
+                        const profitEl = document.getElementById('todayProfit');
+                        profitEl.textContent = formatCurrency(profit);
+                        // Color styling for profit
+                        if (profit > 0) {
+                            profitEl.classList.remove('text-danger', 'text-muted');
+                            profitEl.classList.add('text-success');
+                        } else if (profit < 0) {
+                            profitEl.classList.remove('text-success', 'text-muted');
+                            profitEl.classList.add('text-danger');
+                        } else {
+                            profitEl.classList.remove('text-success', 'text-danger');
+                            profitEl.classList.add('text-muted');
+                        }
+                    }
+                } else {
+                    console.error("Analytics Failed:", analyticsResult.reason);
+                }
+
+                // Suppliers (Independent call)
+                try {
+                    const suppliers = await API.suppliers.getAll();
+                    animateCounter(document.getElementById('totalSuppliers'), suppliers.length);
+                } catch (e) { console.error("Suppliers count failed", e); }
+
+            } catch (error) {
+                console.error('General Dashboard Error:', error);
+            } finally {
+                Loader.hide();
+            }
+        }
+        let pnlChartInstance = null;
+        let productsChartInstance = null;
+
+        function renderCharts(data) {
+            // Store data globally for toggle re-render
+            window.currentAnalyticsData = data;
+
+            // Sales vs Purchases Chart
+            const ctxPnL = document.getElementById('pnlChart').getContext('2d');
+            if (pnlChartInstance) pnlChartInstance.destroy();
+
+            const timeframe = document.getElementById('pnlTimeframe').value;
+            let axisTitle = 'Day of Month';
+            if (timeframe === 'yearly') axisTitle = 'Month';
+            if (timeframe === 'weekly') axisTitle = 'Day of Week';
+
+            pnlChartInstance = new Chart(ctxPnL, {
+                type: 'line',
+                data: {
+                    labels: data.graph.labels,
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: data.graph.sales,
+                            backgroundColor: 'rgba(0, 167, 111, 0.1)',
+                            borderColor: '#00a76f',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Purchases',
+                            data: data.graph.purchases,
+                            backgroundColor: 'rgba(0, 184, 217, 0.1)',
+                            borderColor: '#00b8d9',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 3
+                        },
+
+                        {
+                            label: 'Profit',
+                            data: data.graph.profit,
+                            backgroundColor: 'rgba(255, 86, 48, 0.1)',
+                            borderColor: '#FF5630',
+                            borderWidth: 2,
+                            fill: false, // Don't fill area to avoid clutter
+                            tension: 0.4,
+                            pointRadius: 3,
+                            borderDash: [5, 5] // Dashed line for profit to distinguish
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { position: 'top', align: 'end' },
+                        tooltip: {
+                            usePointStyle: true,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: axisTitle }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [4, 4], color: '#f1f5f9' },
+                            ticks: {
+                                callback: function (value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Top Products Chart (Now Line Chart as requested)
+            const ctxProd = document.getElementById('productsChart').getContext('2d');
+            const metric = document.getElementById('productMetric').value; // 'sales' or 'stock'
+
+            if (productsChartInstance) productsChartInstance.destroy();
+
+            // Prepare Data
+            const labels = data.topProducts.map(p => p.name);
+            const values = data.topProducts.map(p => metric === 'sales' ? p.totalSold : p.currentStock);
+            const label = metric === 'sales' ? 'Units Sold' : 'Units in Stock';
+            const color = metric === 'sales' ? '#ffab00' : '#00b8d9';
+            const bgColor = metric === 'sales' ? 'rgba(255, 171, 0, 0.1)' : 'rgba(0, 184, 217, 0.1)';
+
+            productsChartInstance = new Chart(ctxProd, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: values,
+                        backgroundColor: bgColor,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            usePointStyle: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [4, 4] }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadCharts() {
+            try {
+                Loader.show();
+                const analytics = await API.analytics.getDashboard(document.getElementById('pnlTimeframe').value);
+                renderCharts(analytics);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                Loader.hide();
+            }
+        }
+    </script>
+</body>
+
+</html>
